@@ -8,6 +8,7 @@ import json
 import logging
 
 import requests
+import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
 
@@ -107,6 +108,7 @@ class Controller:  # pylint: disable=R0902,R0904
             raise APIError("%s controllers no longer supported" % version)
 
         if ssl_verify is False:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
             warnings.simplefilter("default", category=InsecureRequestWarning)
 
         self.log.debug("Controller for %s", self.url)
@@ -398,10 +400,10 @@ class Controller:  # pylint: disable=R0902,R0904
         overrides = device_stat.get("port_overrides")
         found = False
         if overrides:
-            for i in overrides:
-                if overrides[i]["port_idx"] == port_idx:
+            for o in overrides:
+                if o["port_idx"] == port_idx:
                     # Override already exists, update..
-                    overrides[i]["poe_mode"] = mode
+                    o["poe_mode"] = mode
                     found = True
                     break
         if not found:
